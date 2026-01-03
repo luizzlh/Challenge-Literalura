@@ -13,8 +13,7 @@ public class Principal {
     private Scanner leitura = new Scanner(System.in);
     private ConsumoAPI consumo = new ConsumoAPI();
     private ConverteDados conversor = new ConverteDados();
-    private final String ENDERECO = "https://www.omdbapi.com/?t=";
-    private final String API_KEY = "&apikey=6585022c";
+    private final String ENDERECO = "https://gutendex.com/books?";
     private SerieRepository repositorio;
     private List<Autor> series = new ArrayList<>();
     private List<DadosAutor> dadosSeries = new ArrayList<>();
@@ -28,18 +27,11 @@ public class Principal {
         var opcao = -1;
         while(opcao != 0) {
             var menu = """
-                    1 - Buscar séries
-                    2 - Buscar episódios
-                    3 - Listar séries buscadas
-                    4 - Buscar série por título
-                    5 - Buscar séries pelo Ator
-                    6 - Top 5 séries
-                    7 - Buscar series por categoria
-                    8 - Buscar series por Total de Temporadas e Avaliação
-                    9 - Buscar livro por trecho
-                    10 - Top 5 episódios por série
-                    11 - Buscar episódios a partir de uma data
-                    
+                    1 - buscar livro pelo título
+                    2 - listar livros registrados
+                    3 - listar autores registrados
+                    4 - listar autores vivos em um determinado ano
+                    5 - listar livros em um determinado idioma
                     0 - Sair                                 
                     """;
 
@@ -49,7 +41,7 @@ public class Principal {
 
             switch (opcao) {
                 case 1:
-                    buscarSerieWeb();
+                    buscarLivroPeloTitulo();
                     break;
                 case 2:
                     buscarEpisodioPorSerie();
@@ -88,6 +80,12 @@ public class Principal {
                     System.out.println("Opção inválida");
             }
         }
+    }
+
+    private void buscarLivroPeloTitulo(){
+        System.out.println("Insira o nome do livro que você deseja procurar");
+        String nomeLivro = leitura.nextLine();
+
     }
 
     private void buscarSerieWeb() {
