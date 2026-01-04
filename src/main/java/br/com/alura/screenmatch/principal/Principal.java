@@ -1,14 +1,14 @@
 package br.com.alura.screenmatch.principal;
 
-import br.com.alura.screenmatch.models.Autor;
-import br.com.alura.screenmatch.models.DadosAutor;
-import br.com.alura.screenmatch.models.DadosLivro;
-import br.com.alura.screenmatch.models.DadosResposta;
+import br.com.alura.screenmatch.models.*;
 import br.com.alura.screenmatch.repository.AutorRepository;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
 
@@ -17,6 +17,7 @@ public class Principal {
     private ConverteDados conversor = new ConverteDados();
     private final String ENDERECO = "https://gutendex.com/books?search=";
     private AutorRepository repositorio;
+    private List<Autor> autores = new ArrayList<>();
 
 
     public Principal(AutorRepository repositorio) {
@@ -44,11 +45,11 @@ public class Principal {
                     buscarLivroWeb();
                     break;
                 case 2:
-                    buscarLivrosRegistrados();
+                    listarLivrosRegistrados();
                     break;
-//                case 3:
-//                    listarSeriesBuscadas();
-//                    break;
+                case 3:
+                    listarAutoresRegistrados();
+                    break;
 //                case 4:
 //                    buscarSeriePorTitulo();
 //                    break;
@@ -68,8 +69,15 @@ public class Principal {
         DadosLivro dados = getDadosLivro();
         DadosAutor dadosAutor = dados.autor().getFirst();
         Autor autor = new Autor(dadosAutor);
-        autor.setLivros(dados);
+
+        autor.setLivros(dados, autor);
         repositorio.save(autor);
+        System.out.println("----- LIVRO -----");
+        System.out.print("Título: " + dados.titulo() + "\n" +
+                "Autor: " + autor.getNome() + "\n" +
+                "Idioma: " + dados.idioma().getFirst() + "\n" +
+                "Número de downloads: " + dados.downloads() + "\n");
+        System.out.println("-----------------");
     }
 
     private DadosLivro getDadosLivro() {
@@ -80,7 +88,32 @@ public class Principal {
         return dadosResposta.results().get(0);
     }
 
-    private void buscarLivrosRegistrados() {
+    private void listarLivrosRegistrados() {
+        List<Livro> livros = repositorio.findAll()
+                        .stream().flatMap(autor -> autor.getLivros().stream())
+                        .toList();
+        livros.forEach(livro ->
+                    System.out.println("----- LIVRO -----" + "\n" +
+                            "Título: " + livro.getTitulo() + "\n" +
+                    "Autor: " + livro.getAutor().getNome() + "\n" +
+                    "Idioma: " + livro.getIdioma() + "\n" +
+                    "Número de downloads: " + livro.getDownloads() + "\n"+
+                            "-----------------" + "\n"));
+    }
+
+    public void listarAutoresRegistrados(){
+        List<Autor> autores = repositorio.findAll();
+        List<Livro> livros = repositorio.findAll().stream()
+                .flatMap(autor -> autor.getLivros().stream())
+                .toList();
+        System.out.println(livros);
+        //autores.forEach(autor -> autor.getLivros().forEach(livro -> livro.getTitulo()));
+        autores.forEach(autor -> System.out.println("----- LIVRO -----" + "\n" +
+                "Autor: " + autor.getNome() + "\n" +
+                "Ano de nascimento: " + autor.getAnoDeNascimento() + "\n" +
+                "Ano de falecimento: " + autor.getAnoDeFalecimento() + "\n" +
+                "Livros: " + autor.getLivros().stream().map(livro -> livro.getTitulo()).toList() + "\n"+
+                "-----------------" + "\n"));
     }
 
 //    private void buscarEpisodioPorSerie(){

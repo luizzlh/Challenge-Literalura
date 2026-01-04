@@ -25,12 +25,17 @@ public class Autor {
         this.nome = dadosAutor.nome();
     }
 
-    public void setLivros(DadosLivro dadosLivro){
+    public void setLivros(DadosLivro dadosLivro, Autor autor){
         List<Livro> livros1 = new ArrayList<>();
-        livros1.add(new Livro(dadosLivro));
+        Livro livro = new Livro(dadosLivro);
+        livro.setAutor(autor);
+        livros1.add(livro);
         this.livros = livros1;
     }
 
+    public List<Livro> getLivros(){
+        return livros;
+    }
 
     public Integer getId() {
         return id;
