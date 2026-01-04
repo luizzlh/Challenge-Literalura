@@ -7,8 +7,12 @@ public class ConverteDados implements IConverteDados{
 
     private ObjectMapper mapper = new ObjectMapper();
 
+
     @Override
     public <T> T obterDados(String json, Class<T> classe) {
+        if (json == null || json.isBlank()) {
+            throw new RuntimeException("Nenhum item encontrado!");
+        }
         try {
             return mapper.readValue(json, classe);
         } catch (JsonProcessingException e) {

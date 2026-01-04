@@ -2,6 +2,8 @@ package br.com.alura.screenmatch.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name="livros")
 public class Livro {
@@ -9,15 +11,24 @@ public class Livro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String idioma;
-    private Double downloads;
+    private List<String> idioma;
+    private Integer downloads;
     private String titulo;
+    @ManyToOne
+    private Autor autor;
 
-    public Livro(Long id, String idioma, Double downloads, String titulo) {
-        this.id = id;
-        this.idioma = idioma;
-        this.downloads = downloads;
-        this.titulo = titulo;
+    public Livro(DadosLivro dadosLivro) {
+        this.idioma = dadosLivro.idioma();
+        this.downloads = dadosLivro.downloads();
+        this.titulo = dadosLivro.titulo();
+    }
+
+    public void setAutor(Autor autor){
+        this.autor = autor;
+    }
+
+    public Autor getAutor() {
+        return autor;
     }
 
     public Livro() {
@@ -32,19 +43,19 @@ public class Livro {
         this.id = id;
     }
 
-    public String getIdioma() {
+    public List<String> getIdioma() {
         return idioma;
     }
 
-    public void setIdioma(String idioma) {
+    public void setIdioma(List<String> idioma) {
         this.idioma = idioma;
     }
 
-    public Double getDownloads() {
+    public Integer getDownloads() {
         return downloads;
     }
 
-    public void setDownloads(Double downloads) {
+    public void setDownloads(Integer downloads) {
         this.downloads = downloads;
     }
 

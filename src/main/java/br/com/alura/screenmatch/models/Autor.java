@@ -2,48 +2,57 @@ package br.com.alura.screenmatch.models;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="autores")
 public class Autor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private LocalDate anoDeFalecimento;
-    private LocalDate anoDeNascimento;
+    private Integer id;
+    private Integer anoDeFalecimento;
+    private Integer anoDeNascimento;
     private String nome;
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Livro> livros = new ArrayList<>();
 
     public Autor(){}
 
-    public Autor(Long id, LocalDate anoDeFalecimento, LocalDate anoDeNascimento, String nome) {
-        this.id = id;
-        this.anoDeFalecimento = anoDeFalecimento;
-        this.anoDeNascimento = anoDeNascimento;
-        this.nome = nome;
+    public Autor(DadosAutor dadosAutor) {
+        this.anoDeFalecimento = dadosAutor.anoFalecimento();
+        this.anoDeNascimento = dadosAutor.anoNascimento();
+        this.nome = dadosAutor.nome();
     }
 
-    public Long getId() {
+    public void setLivros(DadosLivro dadosLivro){
+        List<Livro> livros1 = new ArrayList<>();
+        livros1.add(new Livro(dadosLivro));
+        this.livros = livros1;
+    }
+
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public LocalDate getAnoDeFalecimento() {
+    public Integer getAnoDeFalecimento() {
         return anoDeFalecimento;
     }
 
-    public void setAnoDeFalecimento(LocalDate anoDeFalecimento) {
+    public void setAnoDeFalecimento(Integer anoDeFalecimento) {
         this.anoDeFalecimento = anoDeFalecimento;
     }
 
-    public LocalDate getAnoDeNascimento() {
+    public Integer getAnoDeNascimento() {
         return anoDeNascimento;
     }
 
-    public void setAnoDeNascimento(LocalDate anoDeNascimento) {
+    public void setAnoDeNascimento(Integer anoDeNascimento) {
         this.anoDeNascimento = anoDeNascimento;
     }
 
