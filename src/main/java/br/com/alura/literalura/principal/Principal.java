@@ -1,10 +1,10 @@
-package br.com.alura.screenmatch.principal;
+package br.com.alura.literalura.principal;
 
-import br.com.alura.screenmatch.models.*;
-import br.com.alura.screenmatch.repository.AutorRepository;
-import br.com.alura.screenmatch.repository.LivroRepository;
-import br.com.alura.screenmatch.service.ConsumoAPI;
-import br.com.alura.screenmatch.service.ConverteDados;
+import br.com.alura.literalura.models.*;
+import br.com.alura.literalura.repository.AutorRepository;
+import br.com.alura.literalura.repository.LivroRepository;
+import br.com.alura.literalura.service.ConsumoAPI;
+import br.com.alura.literalura.service.ConverteDados;
 
 import java.util.ArrayList;
 import java.util.List;
