@@ -2,13 +2,13 @@ package br.com.alura.screenmatch.principal;
 
 import br.com.alura.screenmatch.models.*;
 import br.com.alura.screenmatch.repository.AutorRepository;
+import br.com.alura.screenmatch.repository.LivroRepository;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class Principal {
 
@@ -16,12 +16,13 @@ public class Principal {
     private ConsumoAPI consumo = new ConsumoAPI();
     private ConverteDados conversor = new ConverteDados();
     private final String ENDERECO = "https://gutendex.com/books?search=";
-    private AutorRepository repositorio;
-    private List<Autor> autores = new ArrayList<>();
+    private AutorRepository autorRepository;
+    private LivroRepository livroRepository;
 
 
-    public Principal(AutorRepository repositorio) {
-        this.repositorio = repositorio;
+    public Principal(AutorRepository autorRepository, LivroRepository livroRepository) {
+        this.autorRepository = autorRepository;
+        this.livroRepository = livroRepository;
     }
 
     public void exibeMenu() {
@@ -50,12 +51,12 @@ public class Principal {
                 case 3:
                     listarAutoresRegistrados();
                     break;
-//                case 4:
-//                    buscarSeriePorTitulo();
-//                    break;
-//                case 5:
-//                    buscarSeriesPorAtor();
-//                    break;
+                case 4:
+                    listarAutoresVivosEmUmDeterminadoAno();
+                    break;
+                case 5:
+                    listarLivrosEmUmDeterminadoIdioma();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -71,7 +72,7 @@ public class Principal {
         Autor autor = new Autor(dadosAutor);
 
         autor.setLivros(dados, autor);
-        repositorio.save(autor);
+        autorRepository.save(autor);
         System.out.println("----- LIVRO -----");
         System.out.print("Título: " + dados.titulo() + "\n" +
                 "Autor: " + autor.getNome() + "\n" +
@@ -88,26 +89,17 @@ public class Principal {
         return dadosResposta.results().get(0);
     }
 
-    private void listarLivrosRegistrados() {
-        List<Livro> livros = repositorio.findAll()
-                        .stream().flatMap(autor -> autor.getLivros().stream())
-                        .toList();
+    public void imprimeLivrosFormatado(List<Livro> livros){
         livros.forEach(livro ->
-                    System.out.println("----- LIVRO -----" + "\n" +
-                            "Título: " + livro.getTitulo() + "\n" +
-                    "Autor: " + livro.getAutor().getNome() + "\n" +
-                    "Idioma: " + livro.getIdioma() + "\n" +
-                    "Número de downloads: " + livro.getDownloads() + "\n"+
-                            "-----------------" + "\n"));
+                System.out.println("----- LIVRO -----" + "\n" +
+                        "Título: " + livro.getTitulo() + "\n" +
+                        "Autor: " + livro.getAutor().getNome() + "\n" +
+                        "Idioma: " + livro.getIdioma() + "\n" +
+                        "Número de downloads: " + livro.getDownloads() + "\n"+
+                        "-----------------" + "\n"));
     }
 
-    public void listarAutoresRegistrados(){
-        List<Autor> autores = repositorio.findAll();
-        List<Livro> livros = repositorio.findAll().stream()
-                .flatMap(autor -> autor.getLivros().stream())
-                .toList();
-        System.out.println(livros);
-        //autores.forEach(autor -> autor.getLivros().forEach(livro -> livro.getTitulo()));
+    public void imprimeAutoresFormatado(List<Autor> autores){
         autores.forEach(autor -> System.out.println("----- LIVRO -----" + "\n" +
                 "Autor: " + autor.getNome() + "\n" +
                 "Ano de nascimento: " + autor.getAnoDeNascimento() + "\n" +
@@ -116,125 +108,88 @@ public class Principal {
                 "-----------------" + "\n"));
     }
 
-//    private void buscarEpisodioPorSerie(){
-//        listarSeriesBuscadas();
-//        System.out.print("Escolha uma Série pelo nome: ");
-//        var nomeSerie = leitura.nextLine();
-//        Optional<Autor> serie = repositorio.findByTituloContainingIgnoreCase(nomeSerie);
-//
-//        if(serie.isPresent()){
-//            var serieEncontrada = serie.get();
-//            List<DadosTemporada> temporadas = new ArrayList<>();
-//
-//            for (int i = 1; i <= serieEncontrada.getTotalTemporadas(); i++) {
-//                var json = consumo.obterDados(ENDERECO + serieEncontrada.getTitulo()
-//                        .replace(" ", "+") + "&season=" + i + API_KEY);
-//                DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
-//                temporadas.add(dadosTemporada);
-//            }
-//            temporadas.forEach(System.out::println);
-//
-//            List<Livro> livros = temporadas.stream()
-//                    .flatMap(dadosTemporada -> dadosTemporada.episodios().stream()
-//                            .map(dadosEpisodio -> new Livro(dadosTemporada.numero(), dadosEpisodio)))
-//                    .collect(Collectors.toList());
-//            serieEncontrada.setEpisodios(livros);
-//            repositorio.save(serieEncontrada);
-//        }else{
-//            System.out.println("Autor não encontrada!");
-//        }
-//    }
-//
-//    private void listarSeriesBuscadas(){
-//        series = repositorio.findAll();
-//        series.stream()
-//                        .sorted(Comparator.comparing(Autor::getGenero))
-//                                .forEach(System.out::println);
-//        dadosSeries.forEach(System.out::println);
-//    }
-//
-//    private void buscarSeriePorTitulo() {
-//        System.out.print("Escolha uma Série pelo nome: ");
-//        var nomeSerie = leitura.nextLine();
-//        serieBusca = repositorio.findByTituloContainingIgnoreCase(nomeSerie);
-//
-//        if(serieBusca.isPresent()){
-//            System.out.println("Dados da série: " + serieBusca.get());
-//        }else{
-//            System.out.println("Série não encontrada!");
-//        }
-//    }
-//
-//    private void buscarSeriesPorAtor() {
-//        System.out.println("Qual o nome para busca?");
-//        var nomeAtor = leitura.nextLine();
-//        System.out.println("Avaliações a partir de que valor?");
-//        var avaliacao = leitura.nextDouble();
-//        List<Autor> seriesEncontradas = repositorio.findByAtoresContainingIgnoreCaseAndAvaliacaoGreaterThanEqual(nomeAtor, avaliacao);
-//        System.out.println("Séries em que " + nomeAtor + " trabalhou: ");
-//        seriesEncontradas.forEach(autor -> System.out.println(autor.getTitulo() + " avaliação: " + autor.getAvaliacao()));
-//    }
-//
-//    private void buscarTop5Series() {
-//        List<Autor> autorTop = repositorio.findTop5ByOrderByAvaliacaoDesc();
-//        autorTop.forEach(autor -> System.out.println(autor.getTitulo() + " avaliação: " + autor.getAvaliacao()));
-//    }
-//
-//    private void buscarSeriesPorCategoria() {
-//        System.out.println("Deseja buscar series de qual categoria/gênero?");
-//        var nomeGenero = leitura.nextLine();
-//        Categoria categoria = Categoria.fromPortugues(nomeGenero);
-//        List<Autor> seriesPorCategoria = repositorio.findByGenero(categoria);
-//        seriesPorCategoria.forEach(System.out::println);
-//    }
-//
-//    private void buscarSeriePorTotalDeTemporadas() {
-//        System.out.print("Digite o total de temporadas: ");
-//        var totalTemporadas = leitura.nextInt();
-//        leitura.nextLine();
-//        System.out.print("Digite a avaliação: ");
-//        var avaliacao = leitura.nextDouble();
-//        leitura.nextLine();
-//        List<Autor> seriesPorTotalTemporada = repositorio
-//                .seriesPorTemporadaEAvaliacao(totalTemporadas, avaliacao);
-//        seriesPorTotalTemporada.forEach(autor -> System.out.println(autor.getTitulo() + " - avaliação: " + autor.getAvaliacao()));
-//    }
-//
-//    private void buscarEpisodioPorTrecho(){
-//        System.out.print("Digite o trecho do episódio: ");
-//        var trechoEpisodio = leitura.nextLine();
-//        List<Livro> episodiosEncontrados = repositorio.episodiosPorTrecho(trechoEpisodio);
-//        episodiosEncontrados.forEach(livro ->
-//                System.out.printf("Série: %s Temporada: %d - Episódio: %d - %s \n",
-//                        livro.getSerie().getTitulo(), livro.getTemporada(),
-//                        livro.getNumero(), livro.getTitulo()));
-//    }
-//
-//    private void topEpisodiosPorSerie(){
-//        buscarSeriePorTitulo();
-//
-//        if(serieBusca.isPresent()){
-//            Autor autor = serieBusca.get();
-//            List<Livro> topLivros = repositorio.topEpisodiosPorSerie(autor);
-//            topLivros.forEach(livro ->
-//                    System.out.printf("Série: %s Temporada: %d - Episódio: %d - %s Avaliação: %s\n",
-//                            livro.getSerie().getTitulo(), livro.getTemporada(),
-//                            livro.getNumero(), livro.getTitulo(), livro.getAvaliacao()));
-//        }
-//    }
-//
-//    private void buscarEpisodiosDepoisDeUmaData(){
-//        buscarSeriePorTitulo();
-//
-//        if(serieBusca.isPresent()){
-//            System.out.print("Digite o ano limite de lançamento: ");
-//            var anoLancamento = leitura.nextInt();
-//            leitura.nextLine();
-//            Autor autor = serieBusca.get();
-//
-//            List<Livro> episodiosAno = repositorio.episodiosPorSerieEAno(autor, anoLancamento);
-//            episodiosAno.forEach(System.out::println);
-//
-//        }
-//    }
+    public void listarLivrosRegistrados() {
+        List<Livro> livros = autorRepository.findAll()
+                        .stream().flatMap(autor -> autor.getLivros().stream())
+                        .toList();
+        imprimeLivrosFormatado(livros);
+    }
+
+    public void listarAutoresRegistrados(){
+        List<Autor> autores = autorRepository.findAll();
+        imprimeAutoresFormatado(autores);
+    }
+
+    public void listarAutoresVivosEmUmDeterminadoAno(){
+        System.out.println("Insira o ano em que deseja pesquisar");
+        var ano = leitura.nextInt();
+        leitura.nextLine();
+        List<Autor> autores = autorRepository.findAllByAnoDeFalecimentoGreaterThanAndAnoDeNascimentoLessThanEqual(ano, ano);
+        imprimeAutoresFormatado(autores);
+    }
+
+    public void listarLivrosEmUmDeterminadoIdioma(){
+        System.out.println("Insira o idioma para realizar a busca: ");
+        System.out.println("""
+                es - espanhol
+                en - inglês
+                fr - francês
+                pt - português
+                """);
+        var idioma = leitura.nextLine();
+
+        switch (idioma){
+            case "es":
+                listarLivrosEmEspanhol();
+                break;
+            case "en":
+                listarLivrosEmIngles();
+                break;
+            case "fr":
+                listarLivrosEmFrances();
+                break;
+            case "pt":
+                listarLivrosEmPortugues();
+                break;
+            default:
+                System.out.println("Opção inválida");
+                break;
+        }
+    }
+
+    public void listarLivrosEmEspanhol(){
+        List<String> idioma = new ArrayList<>();
+        idioma.add("es");
+        List<Livro> livros = livroRepository.findLivroByIdiomaEquals(idioma);
+        if (livros.isEmpty()){
+            System.out.println("Não existe livros neste idioma!");
+        }else{
+            imprimeLivrosFormatado(livros);
+        }
+    }
+
+    public void listarLivrosEmIngles(){
+        List<String> idioma = new ArrayList<>();
+        idioma.add("en");
+        List<Livro> livros = livroRepository.findLivroByIdiomaEquals(idioma);
+        if (livros.isEmpty()){
+            System.out.println("Não existe livros neste idioma!");
+        }else{
+            imprimeLivrosFormatado(livros);
+        }
+    }
+
+    public void listarLivrosEmFrances(){
+        List<String> idioma = new ArrayList<>();
+        idioma.add("fr");
+        List<Livro> livros = livroRepository.findLivroByIdiomaEquals(idioma);
+        imprimeLivrosFormatado(livros);
+    }
+
+    public void listarLivrosEmPortugues(){
+        List<String> idioma = new ArrayList<>();
+        idioma.add("pt");
+        List<Livro> livros = livroRepository.findLivroByIdiomaEquals(idioma);
+        imprimeLivrosFormatado(livros);
+    }
 }

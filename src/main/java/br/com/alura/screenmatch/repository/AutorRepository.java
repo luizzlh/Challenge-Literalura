@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface AutorRepository extends JpaRepository<Autor, Long> {
 
+    List<Autor> findAllByAnoDeFalecimentoGreaterThanAndAnoDeNascimentoLessThanEqual(int anoFalecimento, int anoNascimento);
+
 }
